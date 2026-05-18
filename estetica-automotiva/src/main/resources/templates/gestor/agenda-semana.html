@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: html('Agenda Semanal', ~{::main-content})}">
+<body>
+<div th:fragment="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i data-lucide="calendar-range"></i> Agenda Semanal</h1>
+            <p class="page-subtitle"
+               th:text="${#temporals.format(inicio, 'dd/MM')} + ' a ' + ${#temporals.format(fim, 'dd/MM/yyyy')}"></p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/gestor/agenda/semana(inicio=${inicio.minusWeeks(1)})}"
+               class="btn btn-outline-secondary">
+                <i data-lucide="chevron-left"></i> Semana anterior
+            </a>
+            <a th:href="@{/gestor/agenda/semana}" class="btn btn-dark">Esta semana</a>
+            <a th:href="@{/gestor/agenda/semana(inicio=${inicio.plusWeeks(1)})}"
+               class="btn btn-outline-secondary">
+                Próxima semana <i data-lucide="chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(agendamentos)}" class="form-card text-center py-5">
+        <i data-lucide="calendar-x" style="width:48px;height:48px;color:var(--border-dark);margin-bottom:1rem;"></i>
+        <h5 class="fw-bold">Nenhum agendamento esta semana</h5>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(agendamentos)}" class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Cliente</th>
+                        <th>Serviço</th>
+                        <th>Placa</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${agendamentos}">
+                        <td th:text="${#temporals.format(a.data, 'dd/MM EEE')}"></td>
+                        <td class="fw-bold" th:text="${#temporals.format(a.horario, 'HH:mm')}"></td>
+                        <td th:text="${a.clienteNome}"></td>
+                        <td th:text="${a.servicoNome}"></td>
+                        <td><span class="placa-tag" th:text="${a.placa}"></span></td>
+                        <td>
+                            <span th:class="'badge-status badge-' + ${a.status.name().toLowerCase()}"
+                                  th:text="${a.status.name()}"></span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a th:href="@{'/gestor/agendamentos/' + ${a.id} + '/editar'}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i data-lucide="pencil"></i>
+                                </a>
+                                <form th:action="@{'/gestor/agendamentos/' + ${a.id} + '/cancelar'}" method="post"
+                                      class="d-inline"
+                                      th:if="${a.status.name() != 'CANCELADO' && a.status.name() != 'CONCLUIDO'}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit"
+                                            onclick="return confirm('Cancelar?')">
+                                        <i data-lucide="x-circle"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

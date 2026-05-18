@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: html('Agendamento', ~{::main-content})}">
+<body>
+<div th:fragment="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <i data-lucide="calendar-plus"></i>
+                <span th:text="${agendamento.id != null} ? 'Editar Agendamento' : 'Novo Agendamento'"></span>
+            </h1>
+            <p class="page-subtitle">Escolha o serviço, data e horário</p>
+        </div>
+        <a th:href="@{/agendamento}" class="btn btn-outline-secondary">
+            <i data-lucide="arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card">
+
+                <form th:action="${agendamento.id != null} ? @{'/agendamento/' + ${agendamento.id} + '/editar'} : @{/agendamento/novo}"
+                      method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                    <!-- SERVIÇO -->
+                    <div class="section-title">
+                        <i data-lucide="wrench"></i> Selecione o Serviço
+                    </div>
+
+                    <div class="row g-3 mb-4" id="servicosGrid">
+                        <div th:each="s : ${servicos}" class="col-md-4">
+                            <div class="servico-card servico-selecionavel"
+                                 th:data-id="${s.id}"
+                                 th:classappend="${agendamento.servicoId == s.id} ? ' selecionado' : ''"
+                                 onclick="selecionarServico(this)">
+                                <div class="servico-icon">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+                                <div class="servico-nome" th:text="${s.nome}"></div>
+                                <div class="servico-desc" th:text="${s.descricao}"></div>
+                                <div class="servico-preco">
+                                    R$ <span th:text="${#numbers.formatDecimal(s.preco, 1, 2, 'COMMA')}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="servicoId" id="servicoIdInput"
+                           th:value="${agendamento.servicoId}" required/>
+
+                    <!-- DATA E HORÁRIO -->
+                    <div class="section-title mt-2">
+                        <i data-lucide="calendar"></i> Data e Horário
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Data</label>
+                            <input type="date" name="data" class="form-control"
+                                   th:value="${agendamento.data}"
+                                   th:min="${hoje}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Horário</label>
+                            <select name="horario" class="form-select" required>
+                                <option value="">Selecione um horário</option>
+                                <th:block th:each="h : ${ {'08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'} }">
+                                    <option th:value="${h}"
+                                            th:text="${h}"
+                                            th:selected="${agendamento.horario != null && agendamento.horario.toString().startsWith(h)}">
+                                    </option>
+                                </th:block>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- VEICULO -->
+                    <div class="section-title">
+                        <i data-lucide="car"></i> Veículo
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Placa</label>
+                            <div th:if="${!#lists.isEmpty(placas)}">
+                                <select name="placa" class="form-select" required>
+                                    <option value="">Selecione a placa</option>
+                                    <option th:each="p : ${placas}" th:value="${p}" th:text="${p}"
+                                            th:selected="${agendamento.placa == p}"></option>
+                                    <option value="outra">Outra placa</option>
+                                </select>
+                            </div>
+                            <div th:if="${#lists.isEmpty(placas)}">
+                                <input type="text" name="placa" class="form-control"
+                                       th:value="${agendamento.placa}"
+                                       placeholder="Ex: ABC-1234"
+                                       style="text-transform:uppercase;" required/>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observação (opcional)</label>
+                            <textarea name="observacao" class="form-control" rows="2"
+                                      placeholder="Alguma observação sobre o serviço?"
+                                      th:text="${agendamento.observacao}"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="check"></i> Confirmar Agendamento
+                        </button>
+                        <a th:href="@{/agendamento}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
