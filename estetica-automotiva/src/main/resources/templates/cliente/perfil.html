@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: html('Meu Perfil', ~{::main-content})}">
+<body>
+<div th:fragment="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i data-lucide="user-circle"></i> Meu Perfil</h1>
+            <p class="page-subtitle">Gerencie seus dados pessoais e veículos</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- DADOS PESSOAIS -->
+        <div class="col-lg-7">
+            <div class="form-card">
+                <div class="section-title">
+                    <i data-lucide="user"></i> Dados Pessoais
+                </div>
+
+                <form th:action="@{/cliente/perfil}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Nome completo</label>
+                            <input type="text" name="nome" class="form-control"
+                                   th:value="${cliente.nome}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CPF</label>
+                            <input type="text" class="form-control cpf-masked"
+                                   th:value="${cliente.cpfMascarado}" disabled/>
+                            <small class="text-muted"></small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" name="telefone" class="form-control"
+                                   th:value="${cliente.telefone}" required/>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" class="form-control"
+                                   th:value="${cliente.email}" disabled/>
+                            <small class="text-muted">O e-mail não pode ser alterado.</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Placas dos veículos</label>
+                            <div id="placasContainer">
+                                <th:block th:each="placa : ${cliente.placas}">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <i data-lucide="car" style="width:14px;height:14px;"></i>
+                                        </span>
+                                        <input type="text" name="placas" class="form-control"
+                                               th:value="${placa}" style="text-transform:uppercase;"/>
+                                        <button type="button" class="btn btn-outline-danger"
+                                                onclick="this.parentElement.remove()">
+                                            <i data-lucide="x" style="width:13px;height:13px;"></i>
+                                        </button>
+                                    </div>
+                                </th:block>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="adicionarPlaca()">
+                                <i data-lucide="plus"></i> Adicionar placa
+                            </button>
+                        </div>
+                    </div>
+                    <hr class="divider"/>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save"></i> Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ALTERAR SENHA -->
+        <div class="col-lg-5">
+            <div class="form-card">
+                <div class="section-title">
+                    <i data-lucide="lock"></i> Alterar Senha
+                </div>
+                <form th:action="@{/cliente/perfil/senha}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Senha Atual</label>
+                        <input type="password" name="senhaAtual" class="form-control"
+                               placeholder="Senha atual" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input type="password" name="novaSenha" class="form-control"
+                               placeholder="Nova senha (mín. 6 caracteres)" required minlength="6"/>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">
+                        <i data-lucide="key"></i> Alterar Senha
+                    </button>
+                </form>
+            </div>
+
+            <!-- INFO LGPD -->
+            <div class="form-card mt-4" style="background:var(--amarelo-light);border-color:var(--amarelo-border);">
+                <div class="section-title" style="border-bottom-color:var(--amarelo-border);">
+                    <i data-lucide="shield-check"></i> Privacidade (LGPD)
+                </div>
+                <p class="small text-muted mb-0">
+                    Seus dados são utilizados exclusivamente para gestão de agendamentos.
+                    O CPF é exibido parcialmente nas listagens administrativas para proteger sua privacidade.
+                    Para solicitar exclusão de dados, entre em contato com a estética.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

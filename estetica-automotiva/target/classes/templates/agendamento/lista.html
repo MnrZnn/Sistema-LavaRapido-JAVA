@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: html('Meus Agendamentos', ~{::main-content})}">
+<body>
+<div th:fragment="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i data-lucide="calendar-check"></i> Meus Agendamentos</h1>
+            <p class="page-subtitle">Visualize e gerencie seus agendamentos</p>
+        </div>
+        <a th:href="@{/agendamento/novo}" class="btn btn-primary">
+            <i data-lucide="plus"></i> Novo Agendamento
+        </a>
+    </div>
+
+    <div class="table-card">
+        <div th:if="${#lists.isEmpty(agendamentos)}" class="empty-state">
+            <i data-lucide="calendar-x"></i>
+            <h5>Nenhum agendamento encontrado</h5>
+            <p>Clique em "Novo Agendamento" para começar.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(agendamentos)}" class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Serviço</th>
+                        <th>Placa</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${agendamentos}">
+                        <td th:text="${#temporals.format(a.data, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(a.horario, 'HH:mm')}"></td>
+                        <td th:text="${a.servicoNome}"></td>
+                        <td><span class="placa-tag" th:text="${a.placa}"></span></td>
+                        <td>
+                            <span th:class="'badge-status badge-' + ${a.status.name().toLowerCase()}"
+                                  th:text="${a.status.name()}"></span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2"
+                                 th:if="${a.status.name() == 'PENDENTE' || a.status.name() == 'CONFIRMADO'}">
+                                <a th:href="@{'/agendamento/' + ${a.id} + '/editar'}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i data-lucide="pencil"></i>
+                                </a>
+                                <form th:action="@{'/agendamento/' + ${a.id} + '/cancelar'}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Cancelar este agendamento?')">
+                                        <i data-lucide="x-circle"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
