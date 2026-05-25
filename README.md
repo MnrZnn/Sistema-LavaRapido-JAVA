@@ -14,9 +14,9 @@ Sistema de Lava Rápido desenvolvido em JAVA (Spring Boot, Thymeleaf, WEB)
 ### Pelo NETBeans
 
 1. Abra o arquivo Maven do projeto no NETBeans
-2. Clique com o botão direito no projeto "Biblioteca" no canto esquerdo da tela
+2. Clique com o botão direito no projeto "estetica-automotiva" no canto esquerdo da tela
 3. Selecione a opção **Run with Maven**
-4. Uma janela abrirá — no campo de escrita no topo, digite o comando `spring-boot:run` e clique em **OK**
+4. Uma janela abrirá, no campo de escrita no topo, digite o comando `spring-boot:run` e clique em **OK**
 5. Aguarde o terminal carregar o projeto e então no seu navegador acesse **localhost:8080**
 
 ---
