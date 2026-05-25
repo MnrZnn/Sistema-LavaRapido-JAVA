@@ -25,7 +25,7 @@ Sistema de Lava Rápido desenvolvido em JAVA (Spring Boot, Thymeleaf, WEB)
 
 1. Abra o CMD (ou terminal) e navegue até a pasta do projeto:
    ```
-   cd caminho/para/a/pasta/ingressos
+   cd caminho/para/a/pasta/estetica-automotiva
    ```
 2. Rode o comando abaixo para iniciar o projeto:
    ```
