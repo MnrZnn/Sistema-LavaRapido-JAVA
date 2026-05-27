@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: html('Agendamento Avulso', ~{::main-content})}">
+<body>
+<div th:fragment="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i data-lucide="clipboard-plus"></i> Agendamento Avulso</h1>
+            <p class="page-subtitle">Agende sem cadastrar o cliente no sistema</p>
+        </div>
+        <a th:href="@{/gestor/agenda/dia}" class="btn btn-outline-secondary">
+            <i data-lucide="arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="alert alert-info mb-4">
+                <i data-lucide="shield-check"></i>
+                <strong>LGPD:</strong> Os dados informados aqui são usados apenas para este agendamento e não geram cadastro permanente no sistema.
+            </div>
+
+            <div class="form-card">
+                <form th:action="@{/gestor/agendamentos/avulso}" method="post" onsubmit="return validarAvulso()">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                    <!-- DADOS DO CLIENTE -->
+                    <div class="section-title">
+                        <i data-lucide="user"></i> Dados do Cliente
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome do cliente</label>
+                            <input type="text" name="clienteNome" class="form-control"
+                                   placeholder="Nome completo" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Placa do veículo</label>
+                            <input type="text" name="placa" class="form-control"
+                                   placeholder="ABC-1234" maxlength="8"
+                                   style="text-transform:uppercase;" required/>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observação (opcional)</label>
+                            <input type="text" name="observacao" class="form-control"
+                                   placeholder="Ex: carro branco, cliente indicado por..."/>
+                        </div>
+                    </div>
+
+                    <!-- SERVIÇO -->
+                    <div class="section-title">
+                        <i data-lucide="wrench"></i> Serviço
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Serviço</label>
+                            <select name="servicoId" id="servicoAvulso" class="form-select" required>
+                                <option value="">Selecione...</option>
+                                <option th:each="s : ${servicos}"
+                                        th:value="${s.id}"
+                                        th:text="${s.nome} + ' — R$ ' + ${#numbers.formatDecimal(s.preco, 1, 2, 'COMMA')} + ' (' + ${s.duracaoHoras} + 'h)'"
+                                        th:data-preco="${s.preco}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Valor cobrado (R$)</label>
+                            <input type="number" name="valorCobrado" id="valorCobrado" class="form-control"
+                                   placeholder="0,00" step="0.01" min="0"/>
+                            <small class="text-muted">Deixe em branco para usar o preço do serviço.</small>
+                        </div>
+                    </div>
+
+                    <!-- DATA E HORÁRIO — no final -->
+                    <div class="section-title">
+                        <i data-lucide="calendar"></i> Data e Horário
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Data</label>
+                            <input type="date" name="data" id="dataAvulso" class="form-control"
+                                   th:min="${hoje}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Horário</label>
+                            <select name="horario" class="form-select" required>
+                                <option value="">Selecione um horário</option>
+                                <option th:each="h : ${ {'08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'} }"
+                                        th:value="${h}" th:text="${h}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="check"></i> Confirmar Agendamento
+                        </button>
+                        <a th:href="@{/gestor/agenda/dia}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script>
+function validarAvulso() {
+    const servico = document.getElementById('servicoAvulso').value;
+    const data = document.getElementById('dataAvulso').value;
+    if (!servico || !data) {
+        alert('AutoBrilho diz: Por favor insira um tipo de lavagem e uma data.');
+        return false;
+    }
+    // preenche valorCobrado com o preço do serviço se estiver vazio
+    const sel = document.getElementById('servicoAvulso');
+    const opt = sel.options[sel.selectedIndex];
+    const preco = opt.getAttribute('data-preco');
+    const campo = document.getElementById('valorCobrado');
+    if (preco && !campo.value) campo.value = preco;
+    return true;
+}
+</script>
+</body>
+</html>
